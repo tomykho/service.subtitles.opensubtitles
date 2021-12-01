@@ -71,11 +71,11 @@ class SubtitleDownloader:
             media_data = get_media_data()
         self.query = {**media_data, **file_data, **language_data}
 
-        file_path = self.query['file_original_path']
-        rar = self.query['rar']
-
-        hash = self.hashFile(file_path, rar)
-        self.query['moviehash'] = hash
+        if not self.query['temp']:
+            file_path = self.query['file_original_path']
+            rar = self.query['rar']
+            hash = self.hashFile(file_path, rar)
+            self.query['moviehash'] = hash
 
         try:
             self.subtitles = self.open_subtitles.search_subtitles(self.query)
@@ -136,7 +136,7 @@ class SubtitleDownloader:
             list_item.setArt({
                 "icon": str(int(round(float(attributes["ratings"]) / 2))),
                 "thumb": attributes["language"]})
-            list_item.setProperty("sync", "true" if attributes["moviehash_match"] else "false")
+            list_item.setProperty("sync", "true" if attributes.get("moviehash_match", False) else "false")
             list_item.setProperty("hearing_imp", "true" if attributes["hearing_impaired"] else "false")
             """TODO take care of multiple cds id&id or something"""
             url = f"plugin://{__scriptid__}/?action=download&id={attributes['files'][0]['file_id']}"
@@ -151,9 +151,11 @@ class SubtitleDownloader:
         log( __name__,"Hash Standard file")
         longlongformat = 'q'  # long long
         bytesize = struct.calcsize(longlongformat)
+        print(file_path)
         f = xbmcvfs.File(file_path)
 
         filesize = f.size()
+        print(filesize)
         hash = filesize
 
         if filesize < 65536 * 2:
