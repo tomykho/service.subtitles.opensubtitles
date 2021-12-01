@@ -151,11 +151,9 @@ class SubtitleDownloader:
         log( __name__,"Hash Standard file")
         longlongformat = 'q'  # long long
         bytesize = struct.calcsize(longlongformat)
-        print(file_path)
         f = xbmcvfs.File(file_path)
 
         filesize = f.size()
-        print(filesize)
         hash = filesize
 
         if filesize < 65536 * 2:
